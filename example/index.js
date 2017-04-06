@@ -24,3 +24,7 @@ Navigator.registerScreen(
     mode: 'tabs',
   }
 );
+Navigator.registerScreen(
+  'SplitScreen',
+  () => require('./screens/SplitScreen'),
+);

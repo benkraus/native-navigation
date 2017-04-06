@@ -8,6 +8,7 @@
 
 protocol InternalReactViewControllerProtocol: class {
   var nativeNavigationInstanceId: String { get }
+  var coordinator: ReactNavigationCoordinator { get }
   var eagerNavigationController: UINavigationController? { get set }
   var isCurrentlyTransitioning: Bool { get set }
   var isPendingNavigationTransition: Bool { get set }
@@ -33,6 +34,29 @@ public protocol ReactViewControllerProtocol: class {
   func dismiss(_ payload: [String: AnyObject])
 }
 
+extension InternalReactViewControllerProtocol {
+  public var coordinator: ReactNavigationCoordinator {
+    return ReactNavigationCoordinator.sharedInstance
+  }
+  
+  public func emitEvent(_ eventName: String, body: AnyObject?) {
+    let name = String(format: "NativeNavigationScreen.%@.%@", eventName, nativeNavigationInstanceId)
+    let args: [AnyObject]
+    if let payload = body {
+      args = [name as AnyObject, payload]
+    } else {
+      args = [name as AnyObject]
+    }
+    // TODO(lmr): there's a more appropriate way to do this now???
+    coordinator.bridge?.enqueueJSCall("RCTDeviceEventEmitter.emit", args: args)
+  }
+  
+  func realNavigationDidHappen() { }
+  func startedWaitingForRealNavigation() { }
+  func setCloseBehavior(_ closeBehavior: String) { }
+  public func dismiss(_ payload: [String : AnyObject]) { }
+}
+
 extension ReactViewController: ReactViewControllerProtocol {}
 extension ReactViewController: InternalReactViewControllerProtocol {
   public func viewController() -> UIViewController {
@@ -45,6 +69,13 @@ extension ReactTabBarController: InternalReactViewControllerProtocol {
   public func viewController() -> UIViewController {
     return self
   }
+}
+
+extension ReactSplitViewController: ReactViewControllerProtocol {}
+extension ReactSplitViewController: InternalReactViewControllerProtocol {
+    public func viewController() -> UIViewController {
+        return self
+    }
 }
 
 

@@ -12,8 +12,6 @@ import React
 
 open class ReactTabBarController: UITabBarController {
 
-  open weak var reactViewControllerDelegate: ReactViewControllerDelegate?
-
   let nativeNavigationInstanceId: String
   var sharedElementsById: [String: WeakViewHolder] = [:]
   var sharedElementGroupsById: [String: WeakViewHolder] = [:]
@@ -26,9 +24,9 @@ open class ReactTabBarController: UITabBarController {
   var eagerNavigationController: UINavigationController?
   var dismissResultCode: ReactFlowResultCode?
   var dismissPayload: [String: AnyObject]?
+  open weak var reactViewControllerDelegate: ReactViewControllerDelegate?
   fileprivate let moduleName: String
   fileprivate var props: [String: AnyObject]
-  fileprivate let coordinator: ReactNavigationCoordinator = ReactNavigationCoordinator.sharedInstance
   fileprivate var initialConfig: [String: AnyObject]
   fileprivate var renderedConfig: [String: AnyObject]
   fileprivate var reactView: UIView?
@@ -88,37 +86,13 @@ open class ReactTabBarController: UITabBarController {
       // for this reason, we are going to add the rootview as frame-less subview.
       reactView.isHidden = true
       self.view.addSubview(reactView)
+      
       self.reactView = reactView
     }
   }
 
   func prepareViewControllerForPresenting() -> UIViewController {
     return self
-//    return coordinator.navigation.makeNavigationController(rootViewController: self)
-  }
-
-  func realNavigationDidHappen() {
-
-  }
-
-  func startedWaitingForRealNavigation() {
-
-  }
-
-  public func emitEvent(_ eventName: String, body: AnyObject?) {
-    let name = String(format: "NativeNavigationScreen.%@.%@", eventName, self.nativeNavigationInstanceId)
-    let args: [AnyObject]
-    if let payload = body {
-      args = [name as AnyObject, payload]
-    } else {
-      args = [name as AnyObject]
-    }
-    // TODO(lmr): there's a more appropriate way to do this now???
-    coordinator.bridge?.enqueueJSCall("RCTDeviceEventEmitter.emit", args: args)
-  }
-
-  func setCloseBehavior(_ closeBehavior: String) {
-
   }
 
   func signalFirstRenderComplete() {
@@ -131,10 +105,6 @@ open class ReactTabBarController: UITabBarController {
 
   func setNavigationBarProperties(props: [String : AnyObject]) {
     // TODO(lmr): not sure what we are supposed to do here for tabbar case...
-  }
-
-  public func dismiss(_ payload: [String : AnyObject]) {
-    
   }
 
   private func refreshTabViews() {
@@ -162,8 +132,7 @@ open class ReactTabBarController: UITabBarController {
 
     tabViews = next
 
-    let nullableViewControllers = tabViews.map { $0.getViewController() }
-    let viewControllers = nullableViewControllers.flatMap { $0 }
+    let viewControllers = tabViews.map { $0.getViewController() }.flatMap { $0 }
     self.setViewControllers(viewControllers, animated: true)
   }
 }

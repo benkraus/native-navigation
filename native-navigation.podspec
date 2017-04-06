@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.authors      = { "intelligibabble" => "leland.m.richardson@gmail.com" }
   s.homepage     = "https://github.com/airbnb/native-navigation#readme"
   s.license      = package['license']
-  s.platform     = :ios, "8.0"
+  s.platform     = :ios, "9.0"
 
   s.module_name  = 'NativeNavigation'
 

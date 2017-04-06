@@ -73,14 +73,13 @@ open class ReactViewController: UIViewController {
   var reactViewHasBeenRendered: Bool = false
   var transition: ReactSharedElementTransition?
   var eagerNavigationController: UINavigationController?
+  var dismissResultCode: ReactFlowResultCode?
+  var dismissPayload: [String: AnyObject]?
   open var reactFlowId: String?
   open var showTabBar: Bool = false // TODO(lmr): showTabBar? is this needed?
   open weak var delegate: ReactViewControllerDelegate?
-  var dismissResultCode: ReactFlowResultCode?
-  var dismissPayload: [String: AnyObject]?
   fileprivate let moduleName: String
   fileprivate var props: [String: AnyObject]
-  fileprivate let coordinator: ReactNavigationCoordinator = ReactNavigationCoordinator.sharedInstance
   fileprivate var initialConfig: [String: AnyObject]
   fileprivate var prevConfig: [String: AnyObject]
   fileprivate var renderedConfig: [String: AnyObject]
@@ -160,7 +159,7 @@ open class ReactViewController: UIViewController {
       bridge: coordinator.bridge,
       moduleName: moduleName,
       initialProperties: props)
-
+    
     if let screenColor = colorForKey("screenColor", initialConfig) {
       self.view.backgroundColor = screenColor
     }
@@ -326,19 +325,6 @@ open class ReactViewController: UIViewController {
       next: renderedConfig
     )
   }
-
-  public func emitEvent(_ eventName: String, body: AnyObject?) {
-    let name = String(format: "NativeNavigationScreen.%@.%@", eventName, self.nativeNavigationInstanceId)
-    let args: [AnyObject]
-    if let payload = body {
-      args = [name as AnyObject, payload]
-    } else {
-      args = [name as AnyObject]
-    }
-    // TODO(lmr): there's a more appropriate way to do this now???
-    coordinator.bridge?.enqueueJSCall("RCTDeviceEventEmitter.emit", args: args)
-  }
-
 
 
   // MARK: Private

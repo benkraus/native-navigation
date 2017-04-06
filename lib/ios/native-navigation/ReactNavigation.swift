@@ -63,14 +63,28 @@ class ReactNavigation: NSObject {
   func push(_ screenName: String, withProps props: [String: AnyObject], options: [String: AnyObject], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     print("push \(screenName)")
     DispatchQueue.main.async {
-      guard let nav = self.coordinator.topNavigationController() else { return }
-      guard let current = self.coordinator.topViewController() as? ReactViewController else {
+      let pushToDetail = (options["detail"] as? Bool) ?? false
+      
+      var nav: UINavigationController? = self.coordinator.topNavigationController()
+      var current: ReactViewController? = self.coordinator.topViewController() as? ReactViewController
+      if let split = self.coordinator.topSplitViewController() {
+        if pushToDetail, split.viewControllers.count == 2 {
+          nav = split.viewControllers.last as? UINavigationController ?? split.viewControllers.last?.navigationController
+          current = split.viewControllers.last?.topMostViewController() as? ReactViewController
+        } else {
+          nav = split.viewControllers.first as? UINavigationController ?? split.viewControllers.first?.navigationController
+          current = split.viewControllers.first?.topMostViewController() as? ReactViewController
+        }
+      }
+      
+      guard let navController = nav else { return }
+      guard let currentVC = current else {
         print("Called push() when topViewController() isn't a ReactViewController")
         return
       }
 
       let pushed = ReactViewController(moduleName: screenName, props: props)
-      pushed.delegate = current.delegate
+      pushed.delegate = currentVC.delegate
 
       let animated = (options["animated"] as? Bool) ?? true
       var makeTransition: (() -> ReactSharedElementTransition)? = nil
@@ -79,7 +93,7 @@ class ReactNavigation: NSObject {
         makeTransition = {
           return ReactSharedElementTransition(
             transitionGroup: transitionGroup,
-            fromViewController: current,
+            fromViewController: currentVC,
             toViewController: pushed as ReactAnimationToContentVendor,
             style: ReactSharedElementTransition.makeDefaultStyle(options),
             options: [:]
@@ -88,7 +102,7 @@ class ReactNavigation: NSObject {
       }
 
       self.coordinator.registerFlow(pushed, resolve: resolve, reject: reject)
-      nav.pushReactViewController(pushed, animated: animated, makeTransition: makeTransition)
+      navController.pushReactViewController(pushed, animated: animated, makeTransition: makeTransition)
     }
   }
 

@@ -32,6 +32,16 @@ final class ViewController: UIViewController {
     pushButton2.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     pushButton2.topAnchor.constraint(equalTo: pushButton1.bottomAnchor, constant: 40).isActive = true
 
+
+    let pushButton3 = UIButton(type: .roundedRect)
+    pushButton3.setTitle("Push SplitScreen", for: .normal)
+    pushButton3.addTarget(self, action: #selector(pushSplitScreen(sender:)), for: .touchUpInside)
+    pushButton3.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(pushButton3)
+    pushButton3.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    pushButton3.topAnchor.constraint(equalTo: pushButton2.bottomAnchor, constant: 40).isActive = true
+
+
     view.backgroundColor = .white
   }
 
@@ -43,6 +53,11 @@ final class ViewController: UIViewController {
   func pushTabScreen(sender: UIButton) {
     let tabScreen = ReactTabBarController(moduleName: "TabScreen")
     self.presentReactViewController(tabScreen, animated: true, completion: nil)
+  }
+  
+  func pushSplitScreen(sender: UIButton) {
+    let splitScreen = ReactSplitViewController(moduleName: "SplitScreen")
+    self.presentReactViewController(splitScreen, animated: true, completion: nil)
   }
 }
 

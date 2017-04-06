@@ -67,6 +67,10 @@ open class ReactNavigationCoordinator: NSObject {
   open func topTabBarController() -> UITabBarController? {
     return topViewController()?.tabBarController
   }
+  
+  open func topSplitViewController() -> UISplitViewController? {
+    return topViewController()?.splitViewController
+  }
 
   open func startFlow(fromName name: String, withProps props: [String: AnyObject], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     guard let flow = delegate?.flowCoordinatorForId?(name) else {
