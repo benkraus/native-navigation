@@ -86,6 +86,7 @@ The
 #### `screenColor: Color`
 
 The background color of the entire screen.
+If the color is translucent, the old screen will be kept below this one (to use it like a modal, for instance).
 
 Defaults to `#FFFFFF`.
 
@@ -118,6 +119,13 @@ Defaults to `'fade'`.
 #### `statusBarStyle: 'light' | 'default'`
 
 
+#### `barStyle: 'black' | 'default' (iOS)`
+
+Configures the bar style effectively updating the status bar color for views inside a navigator.
+
+#### `shadowImage: Image (iOS)`
+
+Image for the shadow drawn under the nav bar.
 
 
 
